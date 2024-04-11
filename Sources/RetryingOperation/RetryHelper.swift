@@ -17,7 +17,7 @@ import Foundation
 
 
 
-public protocol RetryHelper {
+public protocol RetryHelper : Sendable {
 	
 	mutating func setup()
 	mutating func teardown()

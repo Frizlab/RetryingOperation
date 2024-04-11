@@ -19,6 +19,7 @@ import os.log
 #endif
 
 import Logging
+import SafeGlobal
 
 
 
@@ -275,7 +276,7 @@ open class RetryingOperation : Operation {
 	/* Since iOS 11, releasing a timer that has never been resumed crash.
 	 * So we need to set this entity as a class instead of a struct so we can have a “hasBeenResumed” var,
 	 *  modified in `setup()` without a “mutating” modifier on the method… */
-	public class TimerRetryHelper : RetryHelper {
+	public final class TimerRetryHelper : RetryHelper, @unchecked Sendable {
 		
 		public init(retryDelay d: TimeInterval, retryingOperation: RetryingOperation) {
 			delay = d
@@ -301,10 +302,12 @@ open class RetryingOperation : Operation {
 			timer.cancel()
 		}
 		
+		/* Mutable variable in Sendable object.
+		 * This is safe AFAICT because this is never read until the class is deallocated. */
 		private var hasBeenResumed = false
 		
 		private let timer: DispatchSourceTimer
-		fileprivate let delay: TimeInterval /* For synchronous operations... */
+		fileprivate let delay: TimeInterval /* For synchronous operations… */
 		
 	}
 	

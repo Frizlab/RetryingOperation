@@ -56,17 +56,26 @@ final class CustomRetrySynchronousRetryingOperation : RetryingOperation, @unchec
 }
 
 
-class CustomRetryHelper : RetryHelper {
+final class CustomRetryHelper : RetryHelper, @unchecked Sendable {
 	
 	var setupCheckStr = ""
 	var teardownCheckStr = ""
 	
 	func setup() {
+		/* No block form for Linux compat. */
+		lock.lock()
+		defer {lock.unlock()}
+		
 		setupCheckStr += "."
 	}
 	
 	func teardown() {
+		lock.lock()
+		defer {lock.unlock()}
+		
 		teardownCheckStr += "."
 	}
+	
+	private let lock = NSLock()
 	
 }
