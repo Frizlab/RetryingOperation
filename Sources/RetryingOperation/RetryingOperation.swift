@@ -275,7 +275,8 @@ open class RetryingOperation : Operation {
 	
 	/* Since iOS 11, releasing a timer that has never been resumed crash.
 	 * So we need to set this entity as a class instead of a struct so we can have a “hasBeenResumed” var,
-	 *  modified in `setup()` without a “mutating” modifier on the method… */
+	 *  modified in `setup()` without a “mutating” modifier on the method…
+	 * Note we could probably use a struct now the RetryHelper’s methods are mutating. */
 	public final class TimerRetryHelper : RetryHelper, @unchecked Sendable {
 		
 		public init(retryDelay d: TimeInterval, retryingOperation: RetryingOperation) {
