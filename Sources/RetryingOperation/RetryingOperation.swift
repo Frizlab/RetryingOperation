@@ -18,8 +18,8 @@ import Foundation
 import os.log
 #endif
 
+import GlobalConfModule
 import Logging
-import SafeGlobal
 
 
 

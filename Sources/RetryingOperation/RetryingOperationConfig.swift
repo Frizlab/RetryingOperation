@@ -18,46 +18,35 @@ import Foundation
 import os.log
 #endif
 
+import GlobalConfModule
 import Logging
-import SafeGlobal
 
 
 
-/**
- The global configuration for RetryingOperation.
- 
- You can modify all of the variables in this struct to change the default behavior of ``RetryingOperation``.
- Be careful, none of these properties are thread-safe.
- It is a good practice to change the behaviors you want when you start your app, and then leave the config alone.
- 
- - Note: We allow the configuration for a generic `Logger` (from Apple’s swift-log repository), **and** an `OSLog` logger.
- We do this because Apple recommends using `OSLog` directly whenever possible for performance and privacy reason
-  (see [swift-log’s Readme](https://github.com/apple/swift-log/blob/4f876718737f2c2b2ecd6d4cb4b99e0367b257a4/README.md) for more informations).
- 
- The recommended configuration for Logging is to use `OSLog` when you can (you are on an Apple platform that supports `OSLog`) and `Logger` otherwise.
- You can also configure both if you want, though I’m not sure why that would be needed.
- 
- In the future, OSLog’s API should be modified to match the swift-log’s one, and we’ll then probably drop the support for OSLog
-  (because you’ll be able to use OSLog through Logging without any performance or privacy hit). */
-public enum RetryingOperationConfig {
+public extension ConfKeys {
+	/* RetryingOperation conf namespace declaration. */
+	struct RetryingOperation {}
+	var retryingOperation: RetryingOperation {RetryingOperation()}
+}
+
+
+extension ConfKeys.RetryingOperation {
 	
 #if canImport(os)
- #if swift(>=6.0)
-  /* See <https://developer.apple.com/forums/thread/747816?answerId=781922022#781922022>. */
-  #warning("Reevaluate whether nonisolated(unsafe) is still necessary.")
- #endif
-	@available(macOS 10.12, tvOS 10.0, iOS 10.0, watchOS 3.0, *)
-	@SafeGlobal nonisolated(unsafe) public static var oslog: OSLog? = .default
+	#declareConfKey("oslog",  OSLog?         .self, defaultValue: OSLog(subsystem: "me.frizlab.RetryingOperation", category: "Main"))
+	#declareConfKey("logger", Logging.Logger?.self, defaultValue: nil)
+#else
+	#declareConfKey("logger", Logging.Logger?.self, defaultValue: .init(label: "me.frizlab.RetryingOperation"))
 #endif
-	@SafeGlobal public static var logger: Logging.Logger? = {
-#if canImport(os)
-		if #available(macOS 10.12, tvOS 10.0, iOS 10.0, watchOS 3.0, *) {
-			return nil
-		}
-#endif
-		return Logger(label: "com.happn.RetryingOperation")
-	}()
 	
 }
 
-typealias Conf = RetryingOperationConfig
+
+extension Conf {
+	
+#if canImport(os)
+	#declareConfAccessor(\.retryingOperation.oslog,  OSLog?         .self)
+#endif
+	#declareConfAccessor(\.retryingOperation.logger, Logging.Logger?.self)
+	
+}
