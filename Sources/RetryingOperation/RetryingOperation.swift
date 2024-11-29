@@ -77,7 +77,7 @@ import SafeGlobal
  
  A solution is to use `RetryableOperationWrapper`.
  See the doc of this class for more information. */
-open class RetryingOperation : Operation {
+open class RetryingOperation : Operation, @unchecked Sendable {
 	
 	public var numberOfRetries: Int? {
 		retryStateSemaphore.wait(); defer {retryStateSemaphore.signal()}
